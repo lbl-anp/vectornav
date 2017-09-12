@@ -3,7 +3,7 @@
 	<node pkg="vectornav" type="vn200_node" name="vectornav"  output="screen" > 
 	  
 	  <param name="serial_port" type="string" value="/dev/ttyUSB0" />
-	  <param name="serial_baud" type="int"    value="115200" />
+	  <param name="serial_baud" type="int"    value="921600" />
 	  
       <param name="binary_data_output_port" type="int"    value="1" />
       <param name="binary_gps_data_output_rate" type="int"    value="1" />
