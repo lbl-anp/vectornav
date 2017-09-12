@@ -140,12 +140,12 @@ if __name__ == '__main__':
     
   msg_imu = Imu()
   
-  pub_imu  = rospy.Publisher("/Imu"          , Imu)
-  pub_mag  = rospy.Publisher("/MagneticField", MagneticField)
-  pub_temp = rospy.Publisher("/Temerature"   , Temperature)
-  pub_baro = rospy.Publisher("/FluidPressure", FluidPressure)
-  pub_gps  = rospy.Publisher("/NavSatFix"    , NavSatFix)
-  pub_time = rospy.Publisher("/TimeRef"      , TimeReference)
+  pub_imu  = rospy.Publisher("/Imu"          , Imu, queue_size=10)
+  pub_mag  = rospy.Publisher("/MagneticField", MagneticField, queue_size=10)
+  pub_temp = rospy.Publisher("/Temerature"   , Temperature, queue_size=10)
+  pub_baro = rospy.Publisher("/FluidPressure", FluidPressure, queue_size=10)
+  pub_gps  = rospy.Publisher("/NavSatFix"    , NavSatFix, queue_size=10)
+  pub_time = rospy.Publisher("/TimeRef"      , TimeReference, queue_size=10)
   
   #TODO: Only subscribe when we have subscribers
   rospy.Subscriber("/vectornav/imu", sensors,  sub_imuCB)
