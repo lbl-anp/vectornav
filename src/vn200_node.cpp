@@ -351,7 +351,7 @@ void binaryMessageReceived(void * user_data, Packet & p, size_t index)
             ROS_WARN("Received unknown group signature from vectornav");
         }
     } else {
-        ROS_WARN("Received invalid packet from vectornav.");
+        // ROS_WARN("Received invalid packet from vectornav.");
         // Ignore non-binary packets for now.
     }
 }
@@ -399,13 +399,15 @@ int main(int argc, char* argv[])
 
     int retry_cnt = 0;
 
+    uint32_t default_baud = 115200;
+
     // Override XMLRPC shutdown
     ros::XMLRPCManager::instance()->unbind("shutdown");
     ros::XMLRPCManager::instance()->bind("shutdown", shutdownCallback);
     signal(SIGINT, mySigintHandler);
 
     n_.param<std::string>("serial_port" , port     , "/dev/ttyUSB0");
-    n_.param<int>(        "serial_baud" , baud     , 115200);
+    n_.param<int>(        "serial_baud" , baud     , 921600);
     n_.param<int>(        "poll_rate_gps"   , poll_rate_gps, 5);
     n_.param<int>(        "poll_rate_ins"   , poll_rate_ins, 20);
     n_.param<int>(        "poll_rate_imu"   , poll_rate_imu, 100);
@@ -420,7 +422,7 @@ int main(int argc, char* argv[])
     n_.param<int>(        "binary_data_output_port"  , binary_data_output_port, 1); 
     n_.param<int>(        "binary_gps_data_output_rate"  , binary_gps_data_rate, 4); 
     n_.param<int>(        "binary_ins_data_output_rate"  , binary_ins_data_rate, 20); 
-    n_.param<int>(        "binary_imu_data_output_rate"  , binary_imu_data_rate, 100); 
+    n_.param<int>(        "binary_imu_data_output_rate"  , binary_imu_data_rate, 200); 
 
     // Validate the rate inputs.
     if (binary_gps_data_rate < 1 || binary_gps_data_rate > raw_imu_max_rate) {
@@ -469,7 +471,8 @@ int main(int argc, char* argv[])
     ROS_INFO("Initializing vn200. Port:%s Baud:%d\n", port.c_str(), baud);
 
     try {
-        vn200.connect(port, baud);
+	vn200.connect(port, default_baud);
+	vn200.changeBaudRate(baud);
     } catch (...) {
         ROS_FATAL("Could not conenct to vn200 on port:%s @ Baud:%d;"
                 "Did you add your user to the 'dialout' group in /etc/group?", 

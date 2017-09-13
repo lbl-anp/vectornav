@@ -981,9 +981,8 @@ void VnSensor::reset(bool waitForReply)
 
 void VnSensor::changeBaudRate(uint32_t baudrate)
 {
-    writeSerialBaudRate(baudrate, true);
-
-	_pi->pSerialPort->changeBaudrate(baudrate);
+    writeSerialBaudRate(baudrate, false);
+    _pi->pSerialPort->changeBaudrate(baudrate);
 }
 
 VnSensor::Family VnSensor::determineDeviceFamily()
