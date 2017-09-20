@@ -33,7 +33,11 @@ from sensor_msgs.msg  import MagneticField
 from sensor_msgs.msg  import Temperature
 from sensor_msgs.msg  import FluidPressure
 
-from sensor_msgs.msg  import NavSatFix
+
+# from sensor_msgs.msg  import NavSatFix
+from nav_msgs.msg    import Odometry
+
+
 from sensor_msgs.msg  import NavSatStatus
 from sensor_msgs.msg  import TimeReference
 
@@ -103,18 +107,50 @@ def sub_insCB(msg_in):
   msg_imu.orientation.w = q[3]
          
   pub_imu.publish(msg_imu)
-  
-                                                 
-  msg_gps                 = NavSatFix()
-  msg_gps.header          = msg_in.header
-  msg_gps.status.status   = NavSatStatus.STATUS_FIX # TODO - fix this
-  msg_gps.status.service  = NavSatStatus.SERVICE_GPS
-  msg_gps.latitude        = msg_in.LLA.x
-  msg_gps.longitude       = msg_in.LLA.y
-  msg_gps.altitude        = msg_in.LLA.z
-  msg_gps.position_covariance_type  = NavSatFix.COVARIANCE_TYPE_APPROXIMATED
-  msg_gps.position_covariance[0]    = msg_in.PosUncertainty
+
+
+
+
+
+  # global pub
+  global first_msg
+  # Save the first odom message as the 'reference' frame
+  if first_msg == "":
+    first_msg = deepcopy(msg_in)
+    return
+  msg_gps = Odometry()
+  msg_gps = msg_in
+  # Only publish changes from the intial reference frame
+  msg_gps.pose.pose.position.x -= first_msg.pose.pose.position.x
+  msg_gps.pose.pose.position.y -= first_msg.pose.pose.position.y
+  msg_gps.pose.pose.position.z -= first_msg.pose.pose.position.z
+  # I need to learn Q-math again....
+  xyzw_array = lambda o: [o.x, o.y, o.z, o.w]
+  rpy_first = xyzw_array(first_msg.pose.pose.orientation)
+  rpy_out = xyzw_array(msg_in.pose.pose.orientation)
+  q = tf.transformations.quaternion_from_euler(rpy_out[0] - rpy_first[0], rpy_out[1] - rpy_first[1], rpy_out[2] - rpy_first[2])
+  msg_gps.pose.pose.orientation = Quaternion(*q)
   pub_gps.publish(msg_gps)
+  
+  
+
+
+
+  # msg_gps                 = NavSatFix()
+  # msg_gps.header          = msg_in.header
+  # msg_gps.status.status   = NavSatStatus.STATUS_FIX # TODO - fix this
+  # msg_gps.status.service  = NavSatStatus.SERVICE_GPS
+  # msg_gps.latitude        = msg_in.LLA.x
+  # msg_gps.longitude       = msg_in.LLA.y
+  # msg_gps.altitude        = msg_in.LLA.z
+  # msg_gps.position_covariance_type  = NavSatFix.COVARIANCE_TYPE_APPROXIMATED
+  # msg_gps.position_covariance[0]    = msg_in.PosUncertainty
+  # pub_gps.publish(msg_gps)
+  
+  
+  
+  
+  
   
   
   msg_time = TimeReference()
@@ -128,6 +164,8 @@ def sub_insCB(msg_in):
 
 if __name__ == '__main__':
   rospy.init_node('vectornav_sensor_msgs')
+  
+  global first_msg
   
   global pub_imu
   global pub_mag
