@@ -28,7 +28,7 @@ def subCB(msg_in):
   msg_out.altitude   = msg_in.LLA.z
   
   msg_out.position_covariance_type = NavSatFix.COVARIANCE_TYPE_APPROXIMATED
-  msg_out.position_covariance[1] = msg_in.PosUncerainty
+  msg_out.position_covariance[1] = msg_in.PosUncertainty
   
   pub.publish(msg_out)
   
