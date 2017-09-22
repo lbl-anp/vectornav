@@ -44,12 +44,4 @@ if __name__ == '__main__':
 
   rospy.Subscriber("vectornav/ins", ins, subCB)
   rospy.spin()
-  
-  
-  
-  
-  
-  
-  
-  
-  
+ 
